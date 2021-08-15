@@ -9,6 +9,11 @@ const (
 	obliqueValue = 14
 )
 
+type Point struct {
+	X int32
+	Y int32
+}
+
 type AStarFinder struct {
 	walkableChecker func(x, y int32) bool
 }
