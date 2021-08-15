@@ -146,10 +146,10 @@ func (this *nodeHeap) Push(x interface{}) {
 	*this = append(old, item)
 }
 
-type nodeMap map[int32]*node
+type nodeMap map[int64]*node
 
 func (this nodeMap) get(x, y, toX, toY, cost int32, parent *node) *node {
-	n, ok := this[x<<16|y]
+	n, ok := this[int64(x)<<32|int64(y)]
 	if !ok {
 		n = &node{
 			x: int32(x),
@@ -161,7 +161,7 @@ func (this nodeMap) get(x, y, toX, toY, cost int32, parent *node) *node {
 		}
 		n.parent = parent
 		n.hValue = manhattanDistance(x, y, toX, toY)
-		this[x<<16|y] = n
+		this[int64(x)<<32|int64(y)] = n
 	}
 	return n
 }
