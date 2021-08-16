@@ -47,7 +47,7 @@ func (this *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 		if current.x == toX && current.y == toY {
 			curr := current
 			for curr != nil {
-				result = append(result, &Point{X: int(curr.x), Y: int(curr.y)})
+				result = append(result, &Point{X: int32(curr.x), Y: int32(curr.y)})
 				curr = curr.parent
 			}
 			length := len(result)
