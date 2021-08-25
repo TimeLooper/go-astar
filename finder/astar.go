@@ -22,11 +22,11 @@ func NewAStarFinder() *AStarFinder {
 	return &AStarFinder{}
 }
 
-func (this *AStarFinder) SetWalkableChecker(f func(x, y int32) bool) {
-	this.walkableChecker = f
+func (asf *AStarFinder) SetWalkableChecker(f func(x, y int32) bool) {
+	asf.walkableChecker = f
 }
 
-func (this *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
+func (asf *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 	nm := make(nodeMap)
 	openList := &nodeHeap{}
 	heap.Init(openList)
@@ -57,28 +57,28 @@ func (this *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 			}
 			return result
 		}
-		this.checkAdjacentNode(nm, openList, current, current.x, current.y-1, toX, toY, directValue)
-		this.checkAdjacentNode(nm, openList, current, current.x+1, current.y, toX, toY, directValue)
-		this.checkAdjacentNode(nm, openList, current, current.x, current.y+1, toX, toY, directValue)
-		this.checkAdjacentNode(nm, openList, current, current.x-1, current.y, toX, toY, directValue)
+		asf.checkAdjacentNode(nm, openList, current, current.x, current.y-1, toX, toY, directValue)
+		asf.checkAdjacentNode(nm, openList, current, current.x+1, current.y, toX, toY, directValue)
+		asf.checkAdjacentNode(nm, openList, current, current.x, current.y+1, toX, toY, directValue)
+		asf.checkAdjacentNode(nm, openList, current, current.x-1, current.y, toX, toY, directValue)
 
-		if this.walkableChecker(current.x, current.y-1) && this.walkableChecker(current.x+1, current.y) {
-			this.checkAdjacentNode(nm, openList, current, current.x+1, current.y-1, toX, toY, obliqueValue)
+		if asf.walkableChecker(current.x, current.y-1) && asf.walkableChecker(current.x+1, current.y) {
+			asf.checkAdjacentNode(nm, openList, current, current.x+1, current.y-1, toX, toY, obliqueValue)
 		}
-		if this.walkableChecker(current.x+1, current.y) && this.walkableChecker(current.x, current.y+1) {
-			this.checkAdjacentNode(nm, openList, current, current.x+1, current.y+1, toX, toY, obliqueValue)
+		if asf.walkableChecker(current.x+1, current.y) && asf.walkableChecker(current.x, current.y+1) {
+			asf.checkAdjacentNode(nm, openList, current, current.x+1, current.y+1, toX, toY, obliqueValue)
 		}
-		if this.walkableChecker(current.x, current.y+1) && this.walkableChecker(current.x-1, current.y) {
-			this.checkAdjacentNode(nm, openList, current, current.x-1, current.y+1, toX, toY, obliqueValue)
+		if asf.walkableChecker(current.x, current.y+1) && asf.walkableChecker(current.x-1, current.y) {
+			asf.checkAdjacentNode(nm, openList, current, current.x-1, current.y+1, toX, toY, obliqueValue)
 		}
-		if this.walkableChecker(current.x-1, current.y) && this.walkableChecker(current.x, current.y-1) {
-			this.checkAdjacentNode(nm, openList, current, current.x-1, current.y-1, toX, toY, obliqueValue)
+		if asf.walkableChecker(current.x-1, current.y) && asf.walkableChecker(current.x, current.y-1) {
+			asf.checkAdjacentNode(nm, openList, current, current.x-1, current.y-1, toX, toY, obliqueValue)
 		}
 	}
 }
 
-func (this *AStarFinder) checkAdjacentNode(nm nodeMap, openList *nodeHeap, searchNode *node, x, y, toX, toY, cost int32) {
-	if this.walkableChecker(x, y) {
+func (asf *AStarFinder) checkAdjacentNode(nm nodeMap, openList *nodeHeap, searchNode *node, x, y, toX, toY, cost int32) {
+	if asf.walkableChecker(x, y) {
 		node := nm.get(x, y, toX, toY, cost, searchNode)
 		if !node.GetBitState(0) && !node.GetBitState(1) {
 			node.SetBitState(true, 0)
@@ -101,55 +101,55 @@ type node struct {
 	parent *node
 }
 
-func (this *node) SetBitState(state bool, index int) {
+func (n *node) SetBitState(state bool, index int) {
 	if state {
-		this.flag |= byte(0x1) << index
+		n.flag |= byte(0x1) << index
 	} else {
-		this.flag &= (^(byte(0x1) << index))
+		n.flag &= (^(byte(0x1) << index))
 	}
 }
 
-func (this *node) GetBitState(index int) bool {
-	return (this.flag&(0x1<<index))>>index != 0
+func (n *node) GetBitState(index int) bool {
+	return (n.flag&(0x1<<index))>>index != 0
 }
 
 type nodeHeap []*node
 
-func (this nodeHeap) Len() int {
-	return len(this)
+func (nh nodeHeap) Len() int {
+	return len(nh)
 }
 
-func (this nodeHeap) Less(i, j int) bool {
-	a, b := this[i], this[j]
+func (nh nodeHeap) Less(i, j int) bool {
+	a, b := nh[i], nh[j]
 	return a.hValue+a.gValue < b.hValue+b.gValue
 }
 
-func (this nodeHeap) Swap(i, j int) {
-	this[i], this[j] = this[j], this[i]
-	this[i].index = int32(i)
-	this[j].index = int32(j)
+func (nh nodeHeap) Swap(i, j int) {
+	nh[i], nh[j] = nh[j], nh[i]
+	nh[i].index = int32(i)
+	nh[j].index = int32(j)
 }
 
-func (this *nodeHeap) Pop() interface{} {
-	old := *this
+func (nh *nodeHeap) Pop() interface{} {
+	old := *nh
 	n := len(old)
 	no := old[n-1]
 	no.index = -1
-	*this = old[0 : n-1]
+	*nh = old[0 : n-1]
 	return no
 }
 
-func (this *nodeHeap) Push(x interface{}) {
-	old := *this
+func (nh *nodeHeap) Push(x interface{}) {
+	old := *nh
 	item := x.(*node)
 	item.index = int32(len(old))
-	*this = append(old, item)
+	*nh = append(old, item)
 }
 
 type nodeMap map[int64]*node
 
-func (this nodeMap) get(x, y, toX, toY, cost int32, parent *node) *node {
-	n, ok := this[int64(x)<<32|int64(y)]
+func (nm nodeMap) get(x, y, toX, toY, cost int32, parent *node) *node {
+	n, ok := nm[int64(x)<<32|int64(y)]
 	if !ok {
 		n = &node{
 			x: int32(x),
@@ -161,7 +161,7 @@ func (this nodeMap) get(x, y, toX, toY, cost int32, parent *node) *node {
 		}
 		n.parent = parent
 		n.hValue = manhattanDistance(x, y, toX, toY)
-		this[int64(x)<<32|int64(y)] = n
+		nm[int64(x)<<32|int64(y)] = n
 	}
 	return n
 }
