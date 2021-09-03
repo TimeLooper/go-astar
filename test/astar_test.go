@@ -126,7 +126,9 @@ func BenchmarkFind(b *testing.B) {
 	finder := finder.NewAStarFinder()
 	finder.SetWalkableChecker(sc.Walkable)
 	b.StartTimer()
-	finder.Find(0, 0, 111, 111)
+	for i := 0; i < b.N; i++ {
+		finder.Find(0, 0, 111, 111)
+	}
 }
 
 func TestFind(t *testing.T) {
