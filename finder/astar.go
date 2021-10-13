@@ -9,28 +9,28 @@ const (
 	obliqueValue = 14
 )
 
-// grid point
+// Point grid descriptor
 type Point struct {
 	X int32
 	Y int32
 }
 
-// a star finder
+// AStarFinder A* algorighm
 type AStarFinder struct {
 	walkableChecker func(x, y int32) bool
 }
 
-// create a * finder
+// NewAStarFinder create A* finder
 func NewAStarFinder() *AStarFinder {
 	return &AStarFinder{}
 }
 
-// set check grid walkable callback
+// SetWalkableChecker grid walkable callback
 func (asf *AStarFinder) SetWalkableChecker(f func(x, y int32) bool) {
 	asf.walkableChecker = f
 }
 
-// find road from start grid to end grid
+// Find calculate road from start grid to end grid
 func (asf *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 	nm := make(nodeMap)
 	openList := &nodeHeap{}
