@@ -9,30 +9,35 @@ const (
 	obliqueValue = 14
 )
 
+// grid point
 type Point struct {
 	X int32
 	Y int32
 }
 
+// a star finder
 type AStarFinder struct {
 	walkableChecker func(x, y int32) bool
 }
 
+// create a * finder
 func NewAStarFinder() *AStarFinder {
 	return &AStarFinder{}
 }
 
+// set check grid walkable callback
 func (asf *AStarFinder) SetWalkableChecker(f func(x, y int32) bool) {
 	asf.walkableChecker = f
 }
 
+// find road from start grid to end grid
 func (asf *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 	nm := make(nodeMap)
 	openList := &nodeHeap{}
 	heap.Init(openList)
 	fromNode := nm.get(fromX, fromY, toX, toY, 0, nil)
 	// 设置为open
-	fromNode.SetBitState(true, 0)
+	fromNode.setBitState(true, 0)
 	heap.Push(openList, fromNode)
 	var result []*Point
 	for {
@@ -41,9 +46,9 @@ func (asf *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 		}
 		current := heap.Pop(openList).(*node)
 		// 设置为非open状态
-		current.SetBitState(false, 0)
+		current.setBitState(false, 0)
 		// 设置为close状态
-		current.SetBitState(true, 1)
+		current.setBitState(true, 1)
 		if current.x == toX && current.y == toY {
 			curr := current
 			for curr != nil {
@@ -80,8 +85,8 @@ func (asf *AStarFinder) Find(fromX, fromY, toX, toY int32) []*Point {
 func (asf *AStarFinder) checkAdjacentNode(nm nodeMap, openList *nodeHeap, searchNode *node, x, y, toX, toY, cost int32) {
 	if asf.walkableChecker(x, y) {
 		node := nm.get(x, y, toX, toY, cost, searchNode)
-		if !node.GetBitState(0) && !node.GetBitState(1) {
-			node.SetBitState(true, 0)
+		if !node.getBitState(0) && !node.getBitState(1) {
+			node.setBitState(true, 0)
 			heap.Push(openList, node)
 		} else if searchNode.gValue+cost < node.gValue {
 			node.gValue = searchNode.gValue + cost
@@ -101,7 +106,7 @@ type node struct {
 	parent *node
 }
 
-func (n *node) SetBitState(state bool, index int) {
+func (n *node) setBitState(state bool, index int) {
 	if state {
 		n.flag |= byte(0x1) << index
 	} else {
@@ -109,7 +114,7 @@ func (n *node) SetBitState(state bool, index int) {
 	}
 }
 
-func (n *node) GetBitState(index int) bool {
+func (n *node) getBitState(index int) bool {
 	return (n.flag&(0x1<<index))>>index != 0
 }
 
